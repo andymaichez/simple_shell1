@@ -1,40 +1,49 @@
-#include <stdio.h>
+#include <unistd.h>
 #include "shell.h"
 
 /**
- * calculate_triangle_sum - Calculates the sum of a right-angled triangle.
- * @base: The base of the triangle.
- * @height: The height of the triangle.
+ * _strlen - Returns the length of a string.
+ * @str: The string to calculate the length of.
  *
- * Return: The calculated sum.
+ * Return: The length of the string.
  */
-double calculate_triangle_sum(double base, double height)
+size_t _strlen(const char *str)
 {
-	double sum;
+	size_t len = 0;
 
-	sum = 0.5 * base * height;
+	while (str[len] != '\0')
+		len++;
 
-	return (sum);
+	return (len);
+}
+
+/**
+ * _puts - Writes a string to standard output.
+ * @str: The string to be written.
+ */
+void _puts(const char *str)
+{
+	size_t len = _strlen(str);
+	ssize_t bytes_written;
+
+	bytes_written = write(STDOUT_FILENO, str, len);
+	if (bytes_written == -1)
+	{
+		/* Handle error */
+		return;
+	}
 }
 
 /**
  * main - Entry point of the program.
  *
- * Return: 0 on success.
+ * Return: Always 0.
  */
 int main(void)
 {
-	double base, height, sum;
+	const char *message = "Hello, world!\n";
 
-	printf("Enter the base of the triangle: ");
-	scanf("%lf", &base);
-
-	printf("Enter the height of the triangle: ");
-	scanf("%lf", &height);
-
-	sum = calculate_triangle_sum(base, height);
-
-	printf("The sum of the right-angled triangle is: %.2lf\n", sum);
+	_puts(message);
 
 	return (0);
 }
