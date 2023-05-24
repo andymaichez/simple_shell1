@@ -8,7 +8,7 @@
 
 #define BUFFER_SIZE 1024
 #define MAX_ARGS 64
-#define PATH_DELIMITER
+#define PATH_DELIMITERS " \t\n\r\a"
 
 int calculate_triangle_sum(int base, int height);
 int is_interactive_mode(void);
@@ -20,6 +20,6 @@ char *find_command_path(char *command);
 char *get_full_path(char *directory, char *command);
 char *search_in_path(char *command);
 void exit_shell(void);
-void env_shell(void);
+void env_shell(char **environ);
 
 #endif /* SHELL_H */
