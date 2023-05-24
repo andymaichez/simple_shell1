@@ -10,6 +10,7 @@
 #define MAX_ARGS 64
 #define PATH_DELIMITER
 
+int calculate_triangle_sum(int base, int height);
 int is_interactive_mode(void);
 void display_prompt(void);
 char **parse_arguments(char *command, int *argc);

@@ -60,12 +60,12 @@ void execute_command(char *command)
 	args[1] = NULL;
 
 	pid_t pid;
-	pid = fork();
-	if (pid < 0)
-	{
-		perror("fork error");
-		exit(EXIT_FAILURE);
-	}
+		pid = fork();
+		if (pid < 0)
+		{
+			perror("fork error");
+			exit(EXIT_FAILURE);
+		}
 		else if (pid == 0)
 		{
 		if (execve(args[0], args, NULL) == -1)
@@ -90,11 +90,11 @@ void run_shell(void)
 	{
 		display_prompt();
 		char *command = read_command();
-		if (strlen(command) > 0)
-		{
-			command[strcspn(command, "\n")] = '\0';
-			execute_command(command);
-		}
+			if (strlen(command) > 0)
+			{
+				command[strcspn(command, "\n")] = '\0';
+				execute_command(command);
+			}
 			free(command);
 	}
 }
