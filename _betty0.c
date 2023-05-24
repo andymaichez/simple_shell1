@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "shell.h"
 
 /**
  * calculate_triangle_sum - Calculates the sum of a right-angled triangle.
