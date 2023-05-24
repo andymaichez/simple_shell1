@@ -8,22 +8,23 @@
  */
 char *find_command_path(char *command)
 {
-	char *path = _getenv("PATH");
+	char *path = getenv("PATH");
 	char *dir, *path_copy, *full_path;
 	struct stat st;
 
 	if (!path)
 		return (NULL);
 
-	path_copy = _strdup(path);
+	path_copy = strdup(path);
 	if (!path_copy)
 		return (NULL);
 
 	dir = strtok(path_copy, ":");
 	while (dir)
 	{
-		full_path = build_command_path(dir, command);
-		if (full_path && stat(full_path, &st) == 0)
+		full_path = find_command_path(dir, command);
+
+		if (full_path && strcat(full_path, &st) == 0)
 		{
 			free(path_copy);
 			return (full_path);
@@ -45,8 +46,8 @@ char *find_command_path(char *command)
  */
 char *build_command_path(char *dir, char *command)
 {
-	int dir_len = _strlen(dir);
-	int command_len = _strlen(command);
+	int dir_len = strlen(dir);
+	int command_len = strlen(command);
 	char *full_path;
 	int i;
 
