@@ -1,66 +1,39 @@
 #include "shell.h"
 
 /**
- * find_command_path - Finds the full path of a command in the directories list
- * @command: The command name
+ * find_command_path - Find the executable path for a given command.
+ * @dir: The directory to search in.
+ * @command: The command to find the path for.
  *
- * Return: The full path of the command if found, NULL otherwise
+ * Return: The full path to the executable, or NULL if not found.
  */
-char *find_command_path(char *command)
+char *find_command_path(char *dir, char *command)
 {
-	char *path = getenv("PATH");
-	char *dir, *path_copy, *full_path;
 	struct stat st;
+	char *full_path = NULL;
 
-	if (!path)
-		return (NULL);
-
-	path_copy = strdup(path);
-	if (!path_copy)
-		return (NULL);
-
-	dir = strtok(path_copy, ":");
-	while (dir)
+	full_path = malloc(sizeof(char) * (strlen(dir) + strlen(command) + 2));
+	if (full_path == NULL)
 	{
-		full_path = find_command_path(dir, command);
-
-		if (full_path && strcat(full_path, &st) == 0)
-		{
-			free(path_copy);
-			return (full_path);
-		}
-		free(full_path);
-		dir = strtok(NULL, ":");
+		perror("malloc error");
+		exit(EXIT_FAILURE);
 	}
 
-	free(path_copy);
-	return (NULL);
-}
+	sprintf(full_path, "%s/%s", dir, command);
 
-/**
- * build_command_path - Builds the full path of a command
- * @dir: The directory path
- * @command: The command name
- *
- * Return: The full path of the command, or NULL on failure
- */
-char *build_command_path(char *dir, char *command)
-{
-	int dir_len = strlen(dir);
-	int command_len = strlen(command);
-	char *full_path;
-	int i;
-
-	full_path = malloc(sizeof(char) * (dir_len + command_len + 2));
-	if (!full_path)
-		return (NULL);
-
-	for (i = 0; i < dir_len; i++)
-		full_path[i] = dir[i];
-	full_path[i] = '/';
-	for (i = 0; i < command_len; i++)
-		full_path[dir_len + 1 + i] = command[i];
-	full_path[dir_len + 1 + i] = '\0';
+	if (stat(full_path, &st) == 0)
+	{
+		if ((st.st_mode & S_IFMT) != S_IFREG)
+		{
+			free(full_path);
+			full_path = NULL;
+		}
+	}
+	else
+	{
+		free(full_path);
+		full_path = NULL;
+	}
 
 	return (full_path);
 }

@@ -7,27 +7,17 @@
 #include <string.h>
 
 /**
- * is_interactive_mode - Check if the shell is running in interactive mode.
- *
- * Return: 1 if the shell is in interactive mode, 0 otherwise.
+ * handle_command - Handle the command provided by the user.
+ * @args: The arguments of the command.
+ * @command: the command string
  */
-int is_interactive_mode(void)
+void handle_command(char **args, char *command)
 {
-	return (isatty(STDIN_FILENO));
-}
 
-/**
- * display_prompt - Display the shell prompt.
- */
-void display_prompt(void)
-{
-	char *prompt = "#cisfun$ ";
-	ssize_t bytes_written = write(STDOUT_FILENO, prompt, strlen(prompt));
-		if (bytes_written == -1)
-		{
-			perror("write error");
-			exit(EXIT_FAILURE);
-		}
+	if (args[0] != NULL)
+	{
+		execute_command(args, command);
+	}
 }
 
 /**
@@ -63,10 +53,14 @@ char **parse_arguments(char *command, int *argc)
 /**
  * execute_command - Execute a command with the given arguments.
  * @args: An array of arguments.
+ * @command: The command string (unused)
  */
-void execute_command(char **args)
+void execute_command(char **args, char *command)
 {
-	pid_t pid = fork();
+
+	pid_t pid;
+	(void)command;
+	pid = fork();
 		if (pid < 0)
 		{
 			perror("fork error");
@@ -84,43 +78,5 @@ void execute_command(char **args)
 	{
 		int status;
 			waitpid(pid, &status, 0);
-	}
-}
-
-/**
- * run_shell - Run the shell program.
- */
-void run_shell(void)
-{
-	while (1)
-	{
-		char *command;
-		int argc;
-		char **args;
-
-		display_prompt();
-		command = malloc(sizeof(char) * BUFFER_SIZE);
-			if (!command)
-			{
-				perror("malloc error");
-				exit(EXIT_FAILURE);
-			}
-
-	if (fgets(command, BUFFER_SIZE, stdin) == NULL)
-	{
-		free(command);
-		if (is_interactive_mode())
-		{
-			write(STDOUT_FILENO, "\n", 1);
-		}
-		exit(EXIT_SUCCESS);
-	}
-
-	args = parse_arguments(command, &argc);
-		if (argc > 0)
-		execute_command(args);
-
-		free(command);
-		free(args);
 	}
 }
