@@ -17,35 +17,13 @@ int is_interactive_mode(void)
 {
 	return (isatty(STDIN_FILENO));
 }
-void display_prompt(void) /* display_prompt - Display the shell prompt */
+/**
+ * display_prompt- Display the shell prompt
+ */
+void display_prompt(void)
 {
 	if (is_interactive_mode())
 		printf("$ ");
-}
-
-/**
- * read_command - Read a command from the user.
- *
- * Return: The command entered by the user.
- */
-char *read_command(void)
-{
-	char *command = malloc(sizeof(char) * BUFFER_SIZE);
-		if (!command)
-		{
-		perror("malloc error");
-		exit(EXIT_FAILURE);
-		}
-
-	if (fgets(command, BUFFER_SIZE, stdin) == NULL)
-	{
-		free(command);
-		if (is_interactive_mode())
-		printf("\n");
-		exit(EXIT_SUCCESS);
-	}
-
-	return (command);
 }
 
 /**
