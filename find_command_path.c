@@ -1,4 +1,7 @@
 #include "shell.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /**
  * find_command_path - Find the executable path for a given command.
