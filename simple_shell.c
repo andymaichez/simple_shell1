@@ -1,89 +1,97 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <string.h>
-#include "shell.h"
+#include <sys/wait.h>
 
 #define BUFFER_SIZE 1024
+#define PROMPT "$ "
 
 /**
- * is_interactive_mode - Check if the shell is running in interactive mode.
- *
- * Return: 1 if the shell is in interactive mode, 0 otherwise.
- */
-int is_interactive_mode(void)
-{
-	return (isatty(STDIN_FILENO));
-}
-/**
- * display_prompt- Display the shell prompt
- */
-void display_prompt(void)
-{
-	if (is_interactive_mode())
-		printf("$ ");
-}
-
-/**
- * execute_command - Execute a command.
- * @command: The command to execute.
+ * execute_command - Execute the given command using execve
+ * @command: The command to execute
+ * It handles the child and parent processes accordingly.
  */
 void execute_command(char *command)
 {
+	pid_t pid;
+
 	char *args[2];
+	int status;
 
 	args[0] = command;
 	args[1] = NULL;
 
-	pid_t pid;
-		pid = fork();
-		if (pid < 0)
-		{
-			perror("fork error");
-			exit(EXIT_FAILURE);
-		}
-		else if (pid == 0)
-		{
+	pid = fork();
+
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		/* Child process */
 		if (execve(args[0], args, NULL) == -1)
 		{
-			perror("execve error");
+			perror("execve");
 			exit(EXIT_FAILURE);
 		}
-		}
+	}
 	else
 	{
-		int status;
-			waitpid(pid, &status, 0);
+		/* Parent process */
+		if (wait(&status) == -1)
+		{
+			perror("wait");
+			exit(EXIT_FAILURE);
+		}
 	}
 }
 
 /**
- * run_shell - Run the shell.
- */
-void run_shell(void)
-{
-	while (1)
-	{
-		display_prompt();
-		char *command = read_command();
-			if (strlen(command) > 0)
-			{
-				command[strcspn(command, "\n")] = '\0';
-				execute_command(command);
-			}
-			free(command);
-	}
-}
-
-/**
- * main - Entry point of the shell program.
+ * read_command - Read a command from the user
  *
- * Return: Always 0.
+ * Return: The command string, or NULL if end-of-file (Ctrl+D) is encountered
+ */
+char *read_command()
+{
+	char buffer[BUFFER_SIZE];
+
+	printf("%s", PROMPT);
+	fflush(stdout);
+
+	if (fgets(buffer, BUFFER_SIZE, stdin) == NULL)
+	{
+		printf("\n");
+		return (NULL); /* Handle end-of-file (Ctrl+D) */
+	}
+
+	buffer[strcspn(buffer, "\n")] = '\0'; /* Remove trailing newline */
+
+	return (strdup(buffer));
+}
+
+/**
+ * main - Entry point for the simple shell program
+ *
+ * Return: Always 0
  */
 int main(void)
 {
-	run_shell();
-	return (EXIT_SUCCESS);
+	char *command;
+
+	while (1)
+	{
+		command = read_command();
+
+		if (command == NULL)
+		break;
+
+		execute_command(command);
+
+		free(command);
+	}
+
+	return (0);
 }
